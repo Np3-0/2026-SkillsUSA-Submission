@@ -21,6 +21,22 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.linearVelocity = movement * moveSpeed;
+        if (GlobalState.canMove)
+        {
+            rb.linearVelocity = movement * moveSpeed;
+        } 
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            FightLogic.StartFight();
+        }
+        
     }
 }

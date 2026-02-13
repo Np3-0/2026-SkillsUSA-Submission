@@ -1,24 +1,28 @@
+using TMPro;
 using UnityEngine;
-public class HealthBar : MonoBehaviour
-{
-    public float health = 100f;
+using UnityEngine.UI;
 
-    void Start()
-    {
-        health = 100f;
+public class HealthBar : MonoBehaviour {   
+
+    private RawImage fillBar;
+    public TextMeshProUGUI healthCnt;
+    public GameObject playerState;
+
+    private float curHealth, maxHealth;
+
+    void Awake() {
+        fillBar = GameObject.Find("FillBar").GetComponent<RawImage>();
+        playerState = GameObject.Find("Player").GetComponent<PlayerState>().gameObject;
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            health -= 10f;
-            Debug.Log("Health: " + health);
-        }
-        if (health <= 0f)
-        {
-            Debug.Log("dead!");
-        }
+    void Update() {
+        curHealth = playerState.GetComponent<PlayerState>().curHealth;
+        maxHealth = playerState.GetComponent<PlayerState>().maxHealth;
+
+        float width = (curHealth / 100) * 475;
+        fillBar.rectTransform.sizeDelta = new Vector2(width, fillBar.rectTransform.sizeDelta.y);
+
+        healthCnt.text = curHealth + " / " + maxHealth; 
     }
 }
