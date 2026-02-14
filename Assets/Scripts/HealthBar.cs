@@ -4,23 +4,32 @@ using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour {   
 
-    private RawImage fillBar;
+    public RawImage fillBar;
     public TextMeshProUGUI healthCnt;
-    public GameObject playerState;
+    public GameObject state;
+    public string stateName;
 
     private float curHealth, maxHealth;
 
     void Awake() {
-        fillBar = GameObject.Find("FillBar").GetComponent<RawImage>();
-        playerState = GameObject.Find("Player").GetComponent<PlayerState>().gameObject;
+        if (stateName == "Player") {
+            state = GameObject.FindWithTag("Player");
+        } else if (stateName == "Enemy") {
+            state = GameObject.FindWithTag("Enemy");
+        }
     }
 
     // Update is called once per frame
     void Update() {
-        curHealth = playerState.GetComponent<PlayerState>().curHealth;
-        maxHealth = playerState.GetComponent<PlayerState>().maxHealth;
+        if (stateName == "Player") {
+            curHealth = state.GetComponent<PlayerState>().curHealth;
+            maxHealth = state.GetComponent<PlayerState>().maxHealth;
+        } else if (stateName == "Enemy") {
+            curHealth = state.GetComponent<RegularEnemyState>().curHealth;
+            maxHealth = state.GetComponent<RegularEnemyState>().maxHealth;
+        }
 
-        float width = (curHealth / 100) * 475;
+        float width = curHealth / maxHealth * 475;
         fillBar.rectTransform.sizeDelta = new Vector2(width, fillBar.rectTransform.sizeDelta.y);
 
         healthCnt.text = curHealth + " / " + maxHealth; 

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+
 public class RegularEnemyState : MonoBehaviour {
     public static RegularEnemyState Instance {get; set;}
     public float curHealth, maxHealth;
@@ -19,6 +20,6 @@ public class RegularEnemyState : MonoBehaviour {
     }
 
     public void SetHealth(float val){
-        curHealth = val;
+        curHealth = Mathf.Clamp(val, 0, maxHealth);
     }
 }

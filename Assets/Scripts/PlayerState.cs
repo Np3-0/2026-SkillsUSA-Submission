@@ -32,6 +32,6 @@ public class PlayerState : MonoBehaviour {
     }
 
     public void SetHealth(float val){
-        curHealth = val;
+        curHealth = Mathf.Clamp(val, 0, maxHealth);
     }
 }
