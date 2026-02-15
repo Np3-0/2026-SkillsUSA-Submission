@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class FightLogic : MonoBehaviour
 {
-
+    public GameObject buttonUI;
     public static void StartFight()
     {
         GameObject player = GameObject.FindWithTag("Player");
@@ -23,6 +23,7 @@ public class FightLogic : MonoBehaviour
         {
             Debug.LogError("FadeToBlack not found in scene!");
         }
+        
     }
 
     public void Attack(PlayerState player, RegularEnemyState enemy, int type = 0)
@@ -36,18 +37,20 @@ public class FightLogic : MonoBehaviour
         {
             player.SetHealth(player.curHealth - (10 * damageMultiplier));
         }
-        
+        SoundManager.Instance.PlaySound(SoundManager.Instance.attackSound);
         Debug.Log("Player attacks for " + (10 * damageMultiplier) + " damage! Enemy health: " + enemy.curHealth);
     }
 
     public void Ability(PlayerState player, RegularEnemyState enemy, int type = 0)
     {
         float chance = Random.Range(1f, 2f);
-        if (chance <= 1.5f)
+        if (chance <= 1.65f)
         {
             Debug.Log("Ability failed! No damage dealt.");
+            SoundManager.Instance.PlaySound(SoundManager.Instance.missSound);
             return;
         }
+        SoundManager.Instance.PlaySound(SoundManager.Instance.abilitySound);
         int damageMultiplier = Random.Range(2, 5);
         if (type == 0)
         {
@@ -64,6 +67,7 @@ public class FightLogic : MonoBehaviour
     public void Heal(PlayerState player, RegularEnemyState enemy, int type = 0)
     {
         int healAmount = Random.Range(10, 21);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.healSound);
         if (type == 0)
         {
             player.SetHealth(player.curHealth + healAmount);
@@ -83,6 +87,7 @@ public class FightLogic : MonoBehaviour
         if (enemy.curHealth <= 25)
         {
             Heal(playerState, enemy, 1);
+            ChangeButtonState(true);
             return;
         }
         else if (enemy.curHealth <= 60)
@@ -92,6 +97,7 @@ public class FightLogic : MonoBehaviour
             if (healChance == 2 + distance)
             {
                 Heal(playerState, enemy, 1);
+                ChangeButtonState(true);
                 return;
             }
         }
@@ -102,6 +108,16 @@ public class FightLogic : MonoBehaviour
         else
         {
             Ability(playerState, enemy, 1);
+        }
+        ChangeButtonState(true);
+
+    }
+
+    public void ChangeButtonState(bool state)
+    {
+        foreach (Button button in buttonUI.GetComponentsInChildren<Button>())
+        {
+            button.interactable = state;
         }
     }
 
@@ -131,6 +147,7 @@ public class FightLogic : MonoBehaviour
         if (enemy.curHealth <= 0)
         {
             Debug.Log("Enemy defeated!");
+            SoundManager.Instance.PlaySound(SoundManager.Instance.enemyDeathSound);
             GlobalState.canMove = true;
             return;
         }

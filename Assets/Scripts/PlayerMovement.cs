@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
+            SoundManager.Instance.PlaySound(SoundManager.Instance.encounterSound);
             FightLogic.StartFight();
         }
         

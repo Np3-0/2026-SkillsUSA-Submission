@@ -6,7 +6,8 @@ using System;
 public class FadeToBlack : MonoBehaviour
 {
     public Animator fadeAnimator;
-
+    public GameObject fadePanel;
+    
     public void StartTransition(string sceneName = "Fight", Action onComplete = null)
     {
         StartCoroutine(Transition(sceneName, onComplete));
@@ -26,5 +27,6 @@ public class FadeToBlack : MonoBehaviour
             yield return null;
 
         load.allowSceneActivation = true;
+        
     }
 }
