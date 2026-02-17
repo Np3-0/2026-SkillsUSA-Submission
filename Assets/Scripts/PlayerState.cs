@@ -4,7 +4,8 @@ using UnityEngine;
 public class PlayerState : MonoBehaviour {
     public static PlayerState Instance {get; set;}
     public float curHealth, maxHealth;
-
+    public bool canMove = true;
+    
     void Awake() {
         if (Instance != null && Instance != this){
             Destroy(gameObject);

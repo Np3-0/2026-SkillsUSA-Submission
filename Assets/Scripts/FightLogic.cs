@@ -9,8 +9,7 @@ public class FightLogic : MonoBehaviour
     {
         GameObject player = GameObject.FindWithTag("Player");
         GameObject enemy = GameObject.FindWithTag("Enemy");
-
-        GlobalState.canMove = false;
+        PlayerState.Instance.canMove = false;
         FadeToBlack fade = FindFirstObjectByType<FadeToBlack>();
         if (fade != null)
         {
@@ -148,7 +147,7 @@ public class FightLogic : MonoBehaviour
         {
             Debug.Log("Enemy defeated!");
             SoundManager.Instance.PlaySound(SoundManager.Instance.enemyDeathSound);
-            GlobalState.canMove = true;
+            PlayerState.Instance.canMove = true;
             return;
         }
         Invoke("EnemyTurn", 0.75f);
