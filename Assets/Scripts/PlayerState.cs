@@ -21,11 +21,6 @@ public class PlayerState : MonoBehaviour {
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            curHealth -= 10f;
-            Debug.Log("Health: " + curHealth);
-        }
         if (curHealth <= 0f)
         {
             Debug.Log("dead!");
