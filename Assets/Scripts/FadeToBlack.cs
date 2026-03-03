@@ -18,8 +18,6 @@ public class FadeToBlack : MonoBehaviour
         fadeAnimator.SetTrigger("FadeOut");
         yield return new WaitForSeconds(.85f);
 
-        onComplete?.Invoke();
-
         AsyncOperation load = SceneManager.LoadSceneAsync(sceneName);
         load.allowSceneActivation = false;
 
@@ -27,6 +25,12 @@ public class FadeToBlack : MonoBehaviour
             yield return null;
 
         load.allowSceneActivation = true;
+
+        while (!load.isDone)
+            yield return null;
+
+        yield return null;
+        onComplete?.Invoke();
         
     }
 }

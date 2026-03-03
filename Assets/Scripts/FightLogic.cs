@@ -7,15 +7,23 @@ public class FightLogic : MonoBehaviour
     public GameObject buttonUI;
     public static void StartFight()
     {
-        GameObject player = GameObject.FindWithTag("Player");
-        GameObject enemy = GameObject.FindWithTag("Enemy");
         PlayerState.Instance.canMove = false;
         FadeToBlack fade = FindFirstObjectByType<FadeToBlack>();
         if (fade != null)
         {
             fade.StartTransition("Fight", () => {
-                player.transform.position = new Vector3(-6, 0, 0);
-                enemy.transform.position = new Vector3(6, 0, 0);
+                GameObject player = GameObject.FindWithTag("Player");
+                GameObject enemy = GameObject.FindWithTag("Enemy");
+
+                if (player != null)
+                {
+                    player.transform.position = new Vector3(-6f, 0f, 0f);
+                }
+
+                if (enemy != null)
+                {
+                    enemy.transform.position = new Vector3(6f, 0f, 0f);
+                }
             });
         }
         else
