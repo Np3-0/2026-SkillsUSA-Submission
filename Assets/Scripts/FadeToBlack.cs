@@ -7,6 +7,20 @@ public class FadeToBlack : MonoBehaviour
 {
     public Animator fadeAnimator;
     public GameObject fadePanel;
+    public float fadeOutDuration = 0.85f;
+
+    void Awake()
+    {
+        if (fadeAnimator == null)
+        {
+            fadeAnimator = GetComponent<Animator>();
+        }
+
+        if (fadeAnimator == null)
+        {
+            fadeAnimator = GetComponentInChildren<Animator>();
+        }
+    }
     
     public void StartTransition(string sceneName = "Fight", Action onComplete = null)
     {
@@ -15,8 +29,15 @@ public class FadeToBlack : MonoBehaviour
 
     IEnumerator Transition(string sceneName, Action onComplete)
     {
-        fadeAnimator.SetTrigger("FadeOut");
-        yield return new WaitForSeconds(.85f);
+        if (fadeAnimator != null)
+        {
+            fadeAnimator.SetTrigger("FadeOut");
+            yield return new WaitForSeconds(fadeOutDuration);
+        }
+        else
+        {
+            Debug.LogWarning("FadeToBlack: fadeAnimator is not assigned. Loading scene without fade animation.");
+        }
 
         AsyncOperation load = SceneManager.LoadSceneAsync(sceneName);
         load.allowSceneActivation = false;

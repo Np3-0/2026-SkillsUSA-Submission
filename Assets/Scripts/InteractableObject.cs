@@ -7,7 +7,11 @@ public class InteractableObject : MonoBehaviour
     public Transform playerPos;
     public RawImage img;
     public GameObject interactionUI;
+    public Image interactableImg;
+    public Sprite objectSprite;
     public string interactableName;
+    public string endingType;
+    public string enemyTag;
     public string[] text = new string[2];
     float dist;
     TextMeshProUGUI title, infoObj;
@@ -20,11 +24,34 @@ public class InteractableObject : MonoBehaviour
         interactionUI.SetActive(false);
         title = interactionUI.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>();
         infoObj = interactionUI.transform.GetChild(2).gameObject.GetComponent<TextMeshProUGUI>();
+
+        if (objectSprite == null && interactableImg != null)
+        {
+            objectSprite = interactableImg.sprite;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (playerPos == null)
+        {
+            GameObject player = GameObject.FindWithTag("Player");
+            if (player != null)
+            {
+                playerPos = player.transform;
+            }
+            else
+            {
+                if (img != null)
+                {
+                    img.enabled = false;
+                }
+
+                return;
+            }
+        }
+
         dist = Vector3.Distance(playerPos.position, transform.position);
         if (dist < 3)
         {
@@ -50,14 +77,7 @@ public class InteractableObject : MonoBehaviour
     public void ShowInteraction()
     {
         PlayerState.Instance.canMove = false;
-        if (interactionIndex % 2 == 0)
-        {
-            title.text = interactableName;
-        }
-        else
-        {
-            title.text = "Player";
-        }
+        UpdateSpeakerVisuals();
 
         infoObj.text = text[interactionIndex];
         interactionUI.SetActive(true);
@@ -65,6 +85,7 @@ public class InteractableObject : MonoBehaviour
 
     public void MoveInteraction()
     {
+        
         interactionIndex++;
         if (interactionIndex >= text.Length)
         {
@@ -72,23 +93,55 @@ public class InteractableObject : MonoBehaviour
             return;
         }
 
-        if (interactionIndex % 2 == 0)
+        UpdateSpeakerVisuals();
+        infoObj.text = text[interactionIndex];
+    }
+
+    private void UpdateSpeakerVisuals()
+    {
+        bool isObjectTurn = interactionIndex % 2 == 0;
+
+        if (isObjectTurn)
         {
             title.text = interactableName;
+            if (interactableImg != null && objectSprite != null)
+            {
+                interactableImg.sprite = objectSprite;
+            }
+
+            return;
         }
-        else
+
+        title.text = "You";
+        if (interactableImg != null && PlayerState.Instance != null && PlayerState.Instance.img != null)
         {
-            title.text = "Player";
+            interactableImg.sprite = PlayerState.Instance.img;
         }
-        infoObj.text = text[interactionIndex];
     }
 
     public void CloseInteraction()
     {
-        PlayerState.Instance.canMove = true;
+        if (endingType == null || endingType == "")
+        {
+            PlayerState.Instance.canMove = true;
+            interactionUI.SetActive(false);
+            img.enabled = false;
+            interactionIndex = 0;
+            return;
+        } else if (endingType == "Fight")
+        {
+            interactionUI.SetActive(false);
+            img.enabled = false;
+            interactionIndex = 0;
+            SoundManager.Instance.PlaySound(SoundManager.Instance.encounterSound);
+            FightLogic.StartFight(enemyTag, gameObject);
+            return;
+        }
+
         interactionUI.SetActive(false);
         img.enabled = false;
         interactionIndex = 0;
+        FightLogic.TriggerEnding(endingType);
 
     }
 }

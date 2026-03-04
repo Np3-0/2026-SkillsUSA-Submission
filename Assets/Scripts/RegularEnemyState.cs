@@ -1,25 +1,43 @@
-using System.Collections;
 using UnityEngine;
 
-
-public class RegularEnemyState : MonoBehaviour {
-    public static RegularEnemyState Instance {get; set;}
+public class RegularEnemyState : MonoBehaviour
+{
+    public static RegularEnemyState Instance { get; set; }
     public float curHealth, maxHealth;
+    public bool defeated;
 
-    void Awake() {
-        if (Instance != null && Instance != this){
+    private bool IsDefeated => defeated || curHealth <= 0f;
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
             Destroy(gameObject);
-        } else {
+            return;
+        }
+        else
+        {
             Instance = this;
         }
-        DontDestroyOnLoad(this.gameObject);
+
+        DontDestroyOnLoad(gameObject);
     }
-    
-    void Start() {
+
+    void Start()
+    {
         curHealth = maxHealth;
     }
 
-    public void SetHealth(float val){
+    void Update()
+    {
+        if (IsDefeated)
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
+    public void SetHealth(float val)
+    {
         curHealth = Mathf.Clamp(val, 0, maxHealth);
     }
 }

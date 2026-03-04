@@ -4,7 +4,7 @@ public class SoundManager : MonoBehaviour {
 
     public static SoundManager Instance {get; set;}
 
-    public AudioClip attackSound, encounterSound, enemyDeathSound, missSound, abilitySound, healSound;
+    public AudioClip attackSound, encounterSound, enemyDeathSound, missSound, abilitySound, healSound, footstepSound;
     private AudioSource audioSource;
 
     void Awake() {

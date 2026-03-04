@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -30,10 +31,26 @@ public class PlayerMovement : MonoBehaviour
     public Direction4 lastDirection4 = Direction4.Down;
     public int xDirection;
     public int yDirection;
+    private float nextFootstepTime;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        ResolveCameraTarget();
+    }
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += HandleSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= HandleSceneLoaded;
     }
 
     void Update()
@@ -62,7 +79,31 @@ public class PlayerMovement : MonoBehaviour
         }
 
         SoundManager.Instance.PlaySound(SoundManager.Instance.encounterSound);
-        FightLogic.StartFight();
+        FightLogic.StartFight(collision.gameObject.tag, collision.gameObject);
+    }
+
+    private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        ResolveCameraTarget();
+
+        if (scene.name == "Main" && PlayerState.Instance != null)
+        {
+            PlayerState.Instance.canMove = true;
+        }
+    }
+
+    private void ResolveCameraTarget()
+    {
+        if (cameraPos != null)
+        {
+            return;
+        }
+
+        Camera mainCamera = Camera.main;
+        if (mainCamera != null)
+        {
+            cameraPos = mainCamera.transform;
+        }
     }
 
     private void GetMovement()
@@ -117,13 +158,38 @@ public class PlayerMovement : MonoBehaviour
     private void MovePlayer()
     {
         rb.linearVelocity = movement * moveSpeed;
+        if (movement.sqrMagnitude > IdleThreshold)
+        {
+            PlayFootstepSound();
+        }
+    }
+
+    private void PlayFootstepSound()
+    {
+        if (!PlayerState.Instance.isMoving || Time.time < nextFootstepTime)
+        {
+            return;
+        }
+
+        AudioClip footstepClip = SoundManager.Instance.footstepSound;
+        if (footstepClip == null)
+        {
+            return;
+        }
+
+        SoundManager.Instance.PlaySound(footstepClip);
+        nextFootstepTime = Time.time + footstepClip.length;
     }
 
     private void FollowCamera()
     {
         if (cameraPos == null)
         {
-            return;
+            ResolveCameraTarget();
+            if (cameraPos == null)
+            {
+                return;
+            }
         }
 
         cameraPos.position = new Vector3(transform.position.x, transform.position.y, cameraPos.position.z);
